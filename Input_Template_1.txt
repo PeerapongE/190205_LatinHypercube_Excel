@@ -1,0 +1,4 @@
+This is input file#1 for getting idea of automated sampling with python
+Var-1 = __Variable-1__
+Var-2 = __Variable-2__
+Var-3 = __Variable-3__

@@ -1,0 +1,68 @@
+#######################################
+# IXFVERSION: 2015.1 DEVELOPER (534342)
+#######################################
+
+# Common properties (grid geometry and in-place regions)
+INCLUDE "Input/GSG/COMMON/FIELDXX-FF_MR_TEMPLATE.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="geom_and_props" }
+INCLUDE "Input/GSG/COMMON/FIELDXX-FF_MR_TEMPLATE_ACTIVE_CELL_FLAG.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/GSG/COMMON/FIELDXX-FF_MR_TEMPLATE_FLUID_IN_PLACE_REGION.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/GSG/COMMON/FIELDXX-FF_MR_TEMPLATE_NET_TO_GROSS_RATIO.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+
+# Grid property assignment
+INCLUDE "Input/GSG/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_PERM_I.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/GSG/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_PERM_J.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/GSG/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_PERM_K.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/GSG/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_POROSITY.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/IXF/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_FAULTS.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+
+# Region definition and assignment
+INCLUDE "Input/GSG/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_REGIONS.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/GSG/SC1_SW-NE_EXP-VAR/R01/SC1_SW-NE_EXP-VAR_R01_ARITH_OPERATION_REGION.GSG" { simulation="ix" type="gsg" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" gsg_type="props" }
+INCLUDE "Input/IXF/COMMON/BASE_REGIONS_FLUID-SEP16_FIPNUM17.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+EXTENSION "RegionMappingExtension"
+
+# Simulation settings, rock and fluid properties
+INCLUDE "Input/IXF/COMMON/BASE_RESERVOIR_DEFINITION.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/ix_reservoir_date_definition/RESERVOIR_DEFINITION_EPS-JUN19.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/BASE_RESERVOIR_SIMULATION_SETTINGS_Tunings11.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/BASE_FLUIDS_AND_CONTACTS_BLACKOIL_7C_V6.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/BASE_SEPARATORS.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/BASE_ROCK_PROPERTIES_V2.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/DST_parameter_adjustment/DST_ORDV_local_adj_compile.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" preserve="true" }
+	# Add this line to incorporate ORDV DST adjustment
+	
+# Reservoir edits
+INCLUDE "Input/IXF/COMMON/rock_properties/reservoir_edits_base_scal_constant_cf.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" preserve="true" }
+
+INCLUDE "Input/IXF/COMMON/lhs_uncertainty/__OUTPUT-IXF__.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" preserve="true" }  #### LHS ##################
+INCLUDE "Input/IXF/COMMON/lhs_uncertainty/REGION_HEAVY_PVT.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }           
+INCLUDE "Input/IXF/COMMON/lhs_uncertainty/PVT_HEAVY.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" preserve="true" } 
+
+
+# Wells and Development strategies
+INCLUDE "Input/IXF/COMMON/wells/XY1_TRAJECTORY.csv" { simulation="ix" type="trajectory" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/VFP/GasLift_Conventional 1_VFP.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/wells/XY1_WELL_DEFINITION.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/wells/XY1_WELL_CONNECTIONS.ixf" { simulation="ix" type="ixf" reservoir="FIELDXX_PTTEP_SW-NE_DST-ALL" }
+INCLUDE "Input/IXF/COMMON/wells/XY1_WELL_COMPLETIONS_RHF_OGB_ORDV.ixf" { simulation="fm" type="ixf" }
+INCLUDE "Input/IXF/COMMON/wells/XY1_WELL_CONTROL.ixf" { simulation="fm" type="ixf" }
+
+
+INCLUDE "Input/IXF/COMMON/FM_2017/Case-2_Final_PLAT_60K_ND_GL_Mer_7-5_econ.ixf" { simulation="fm" type="ixf" }
+
+# Report setting
+INCLUDE "Input/IXF/COMMON/BASE_REPORT_SETTINGS.ixf" { simulation="fm" type="ixf" }
+INCLUDE "Input/IXF/COMMON/DATES_1-Jun-2019_End.ixf" { simulation="fm" type="ixf" }
+
+
+# Test PeerapongE
+
+test var
+__KLIN-B__
+
+test var
+__KRWR-A__
+
+test var
+__OUTPUT-IXF__
+

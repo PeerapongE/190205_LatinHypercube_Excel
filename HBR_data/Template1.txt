@@ -1,0 +1,174 @@
+MODEL_DEFINITION
+
+
+CellPropertyEdit "Deactivate_facies" [
+	Family						Name		Property			Expression
+	"ARITH_OPERATION_REGION"	"Shale"		"ACTIVE_CELL_FLAG"	"0"
+	"ARITH_OPERATION_REGION"	"SS-Poor"	"ACTIVE_CELL_FLAG"	"0"
+	"FLUID_IN_PLACE_REGION"		"TAGI_NONE"	"ACTIVE_CELL_FLAG"	"0"
+	"FLUID_IN_PLACE_REGION"		"ORDV_NONE"	"ACTIVE_CELL_FLAG"	"0"
+	"FLUID_IN_PLACE_REGION" 	"TAGI_NONE" "ACTIVE_CELL_FLAG"   "0"
+]
+
+CellPropertyEdit "Grid_adjustment" [
+	Family		Name			Property						Expression
+	"RESERVOIR" "RESERVOIR"       "PERM_I"   "PERM_I*((__KLIN-A__)/0.3092)*(PERM_I/0.3092)^((__KLIN-B__)/1.1479-1)"
+	"RESERVOIR" "RESERVOIR"       "PERM_J"   "PERM_I"
+	"RESERVOIR" "RESERVOIR"       "PERM_K"   "PERM_I*(__KVKH__)"
+	"RESERVOIR" "RESERVOIR"       "JFUNCTION_PERM"	"PERM_I"
+	
+	"RESERVOIR" "RESERVOIR" 	"PERM_I"						"MIN(1000,PERM_I)"     #Truncate max perm to be 1,000 mD              											 
+	"RESERVOIR" "RESERVOIR" 	"PERM_J"						"MIN(1000,PERM_J)"              
+	
+]
+
+RockCompressibility "Dummy compressibility_4e-6" {
+    RefPressure=8000
+    PoreVolCompressibility=__CF__e-06
+}
+
+###################################################
+#  REMOVE THIS PART IN THE ACTUAL SIMULATION RUN  #
+###################################################
+
+RockMgr {
+	HorizontalEndPointScaling=TRUE
+	VerticalEndPointScaling=TRUE
+	ThreePointScaling=TRUE
+}
+
+# RQI = 100*0.0314*(PERM_I/POROSITY)^0.5
+# FZI = 0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))
+
+CellPropertyEdit "Saturation_end_points" [
+	Family			Name			Property								Expression                                                                                 									# ECLIPSE EQUIVALENT
+	
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"CONNATE_WATER_SATURATION"				"MAX(0.05,(__SWL__)*EXP(-0.154*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))))"        	    # SWL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"CRITICAL_WATER_SATURATION"				"CONNATE_WATER_SATURATION+(__SWCR__)"        														# SWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"MAX_WATER_SATURATION"					"1"                                                                                        			# SWU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"CONNATE_GAS_SATURATION"				"0.00"                                                                                     			# SGL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"CRITICAL_GAS_SATURATION"				"(__SGCR__)"                                                                                     			# SGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"RESIDUAL_OIL_SATURATION_TO_WATER"		"(__SOWCR__)"                                                                                     	# SOWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"RESIDUAL_OIL_SATURATION_TO_GAS"		"(__SOGCR__)"                                                                                     	# SOGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"MAX_GAS_SATURATION"					"1-CONNATE_WATER_SATURATION"                                                               			# SGU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"MAX_WATER_RELATIVE_PERM"				"1"                                                                                        			# KRW
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"MAX_GAS_RELATIVE_PERM"					"1"                                                                                        			# KRG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"MAX_OIL_RELATIVE_PERM"					"MAX(0.20,MIN(0.80,0.1906*LN(100*0.0314*(PERM_I/POROSITY)^0.5)-(__KRO-A__)))"                   	# KRO
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"WATER_RELATIVE_PERM_RESIDUAL_OIL"		"MAX(0.2,MIN(0.6,(__KRWR-A__)*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))+(__KRWR-B__)))"     # KRWR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"MAX_GAS_RELATIVE_PERM_RESIDUAL_OIL"	"0.70*MAX_OIL_RELATIVE_PERM"										                       			# KRGR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"OIL_RELATIVE_PERM_CRITICAL_GAS"		"0.75*MAX_OIL_RELATIVE_PERM"              											       			# KRORG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type1" 	"OIL_RELATIVE_PERM_CRITICAL_WATER"		"1.00*MAX_OIL_RELATIVE_PERM"                   											   			# KRORW	
+
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"CONNATE_WATER_SATURATION"				"MAX(0.05,(__SWL__)*EXP(-0.154*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))))"        	    # SWL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"CRITICAL_WATER_SATURATION"				"CONNATE_WATER_SATURATION+(__SWCR__)"        														# SWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"MAX_WATER_SATURATION"					"1"                                                                                        			# SWU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"CONNATE_GAS_SATURATION"				"0.00"                                                                                     			# SGL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"CRITICAL_GAS_SATURATION"				"(__SGCR__)"                                                                                     			# SGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"RESIDUAL_OIL_SATURATION_TO_WATER"		"(__SOWCR__)"                                                                                     	# SOWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"RESIDUAL_OIL_SATURATION_TO_GAS"		"(__SOGCR__)"                                                                                     	# SOGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"MAX_GAS_SATURATION"					"1-CONNATE_WATER_SATURATION"                                                               			# SGU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"MAX_WATER_RELATIVE_PERM"				"1"                                                                                        			# KRW
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"MAX_GAS_RELATIVE_PERM"					"1"                                                                                        			# KRG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"MAX_OIL_RELATIVE_PERM"					"MAX(0.20,MIN(0.80,0.1906*LN(100*0.0314*(PERM_I/POROSITY)^0.5)-(__KRO-A__)))"                   	# KRO
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"WATER_RELATIVE_PERM_RESIDUAL_OIL"		"MAX(0.2,MIN(0.6,(__KRWR-A__)*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))+(__KRWR-B__)))"     # KRWR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"MAX_GAS_RELATIVE_PERM_RESIDUAL_OIL"	"0.70*MAX_OIL_RELATIVE_PERM"										                       			# KRGR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"OIL_RELATIVE_PERM_CRITICAL_GAS"		"0.75*MAX_OIL_RELATIVE_PERM"              											       			# KRORG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type2" 	"OIL_RELATIVE_PERM_CRITICAL_WATER"		"1.00*MAX_OIL_RELATIVE_PERM"                   			
+	
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"CONNATE_WATER_SATURATION"				"MAX(0.05,(__SWL__)*EXP(-0.154*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))))"        	    # SWL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"CRITICAL_WATER_SATURATION"				"CONNATE_WATER_SATURATION+(__SWCR__)"        														# SWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"MAX_WATER_SATURATION"					"1"                                                                                        			# SWU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"CONNATE_GAS_SATURATION"				"0.00"                                                                                     			# SGL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"CRITICAL_GAS_SATURATION"				"(__SGCR__)"                                                                                     			# SGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"RESIDUAL_OIL_SATURATION_TO_WATER"		"(__SOWCR__)"                                                                                     	# SOWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"RESIDUAL_OIL_SATURATION_TO_GAS"		"(__SOGCR__)"                                                                                     	# SOGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"MAX_GAS_SATURATION"					"1-CONNATE_WATER_SATURATION"                                                               			# SGU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"MAX_WATER_RELATIVE_PERM"				"1"                                                                                        			# KRW
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"MAX_GAS_RELATIVE_PERM"					"1"                                                                                        			# KRG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"MAX_OIL_RELATIVE_PERM"					"MAX(0.20,MIN(0.80,0.1906*LN(100*0.0314*(PERM_I/POROSITY)^0.5)-(__KRO-A__)))"                   	# KRO
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"WATER_RELATIVE_PERM_RESIDUAL_OIL"		"MAX(0.2,MIN(0.6,(__KRWR-A__)*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))+(__KRWR-B__)))"     # KRWR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"MAX_GAS_RELATIVE_PERM_RESIDUAL_OIL"	"0.70*MAX_OIL_RELATIVE_PERM"										                       			# KRGR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"OIL_RELATIVE_PERM_CRITICAL_GAS"		"0.75*MAX_OIL_RELATIVE_PERM"              											       			# KRORG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type3" 	"OIL_RELATIVE_PERM_CRITICAL_WATER"		"1.00*MAX_OIL_RELATIVE_PERM"                   			
+	
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"CONNATE_WATER_SATURATION"				"MAX(0.05,(__SWL__)*EXP(-0.154*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))))"        	    # SWL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"CRITICAL_WATER_SATURATION"				"CONNATE_WATER_SATURATION+(__SWCR__)"        														# SWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"MAX_WATER_SATURATION"					"1"                                                                                        			# SWU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"CONNATE_GAS_SATURATION"				"0.00"                                                                                     			# SGL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"CRITICAL_GAS_SATURATION"				"(__SGCR__)"                                                                                     			# SGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"RESIDUAL_OIL_SATURATION_TO_WATER"		"(__SOWCR__)"                                                                                     	# SOWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"RESIDUAL_OIL_SATURATION_TO_GAS"		"(__SOGCR__)"                                                                                     	# SOGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"MAX_GAS_SATURATION"					"1-CONNATE_WATER_SATURATION"                                                               			# SGU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"MAX_WATER_RELATIVE_PERM"				"1"                                                                                        			# KRW
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"MAX_GAS_RELATIVE_PERM"					"1"                                                                                        			# KRG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"MAX_OIL_RELATIVE_PERM"					"MAX(0.20,MIN(0.80,0.1906*LN(100*0.0314*(PERM_I/POROSITY)^0.5)-(__KRO-A__)))"                   	# KRO
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"WATER_RELATIVE_PERM_RESIDUAL_OIL"		"MAX(0.2,MIN(0.6,(__KRWR-A__)*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))+(__KRWR-B__)))"     # KRWR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"MAX_GAS_RELATIVE_PERM_RESIDUAL_OIL"	"0.70*MAX_OIL_RELATIVE_PERM"										                       			# KRGR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"OIL_RELATIVE_PERM_CRITICAL_GAS"		"0.75*MAX_OIL_RELATIVE_PERM"              											       			# KRORG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type4" 	"OIL_RELATIVE_PERM_CRITICAL_WATER"		"1.00*MAX_OIL_RELATIVE_PERM"                   			
+	
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"CONNATE_WATER_SATURATION"				"MAX(0.05,(__SWL__)*EXP(-0.154*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))))"        	    # SWL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"CRITICAL_WATER_SATURATION"				"CONNATE_WATER_SATURATION+(__SWCR__)"        														# SWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"MAX_WATER_SATURATION"					"1"                                                                                        			# SWU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"CONNATE_GAS_SATURATION"				"0.00"                                                                                     			# SGL
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"CRITICAL_GAS_SATURATION"				"(__SGCR__)"                                                                                     			# SGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"RESIDUAL_OIL_SATURATION_TO_WATER"		"(__SOWCR__)"                                                                                     	# SOWCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"RESIDUAL_OIL_SATURATION_TO_GAS"		"(__SOGCR__)"                                                                                     	# SOGCR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"MAX_GAS_SATURATION"					"1-CONNATE_WATER_SATURATION"                                                               			# SGU
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"MAX_WATER_RELATIVE_PERM"				"1"                                                                                        			# KRW
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"MAX_GAS_RELATIVE_PERM"					"1"                                                                                        			# KRG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"MAX_OIL_RELATIVE_PERM"					"MAX(0.20,MIN(0.80,0.1906*LN(100*0.0314*(PERM_I/POROSITY)^0.5)-(__KRO-A__)))"                   	# KRO
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"WATER_RELATIVE_PERM_RESIDUAL_OIL"		"MAX(0.2,MIN(0.6,(__KRWR-A__)*0.0314*(PERM_I/POROSITY)^0.5/(POROSITY/(1-POROSITY))+(__KRWR-B__)))"     # KRWR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"MAX_GAS_RELATIVE_PERM_RESIDUAL_OIL"	"0.70*MAX_OIL_RELATIVE_PERM"										                       			# KRGR
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"OIL_RELATIVE_PERM_CRITICAL_GAS"		"0.75*MAX_OIL_RELATIVE_PERM"              											       			# KRORG
+	"SATURATION_FUNCTION_DRAINAGE_TABLE_NO"	  "TAGI_Type5" 	"OIL_RELATIVE_PERM_CRITICAL_WATER"		"1.00*MAX_OIL_RELATIVE_PERM"                   			
+	]
+
+Equilibrium "MAS-3 (TAGI)/MAS_TAGI" {
+    WOCDepth=11866.79828
+}
+
+Equilibrium "ROS-1 (TAGI)/ROS_TAGI" {
+    WOCDepth=__ROS__    
+}
+
+Equilibrium "RDA-1 (TAGI)/RDA-N_TAGI" {
+    WOCDepth=__RDA-OGB__
+}
+
+Equilibrium "RDA-1 (TAGI)/RDA-S_TAGI" {
+    WOCDepth=__RDA-OGB__
+}
+
+Equilibrium "RDA-1 (TAGI)/OGB_TAGI" {
+    WOCDepth=__RDA-OGB__
+}
+
+Equilibrium "SAB-1 (TAGI)/SAB_TAGI" {
+    WOCDepth=__SAB-RHF__
+}
+
+Equilibrium "SAB-1 (TAGI)/RHF_TAGI" {
+    WOCDepth=__SAB-RHF__
+}
+
+Equilibrium "SAB-1 (TAGI)/SAB-EXT_TAGI" {
+    WOCDepth=__SAB-RHF__
+}
+
+Equilibrium "SAB-1 (TAGI)/SMR_TAGI" {
+    WOCDepth=__SMR__
+}
+
+Equilibrium "RLG-1 (TAGI)/RLG_TAGI" {
+    WOCDepth=__RLG__    
+}
+
+Equilibrium "RTF-1 (TAGI)/SMRE-RTF_TAGI" {
+    WOCDepth=__SMRE-RTF__
+}
+
+Equilibrium "REZ-1bis 2-16 (TAGI)/BOG-REZ_TAGI" {
+    WOCDepth=__BOG-REZ__    
+}
+
